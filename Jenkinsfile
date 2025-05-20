@@ -1,10 +1,12 @@
 pipeline {
-    agent any
+    agent {
+        node {
+            label 'master'
+        }
+    }
     
     environment {
         NODE_VERSION = '18.0.0'
-        RENDER_API_KEY = credentials('RENDER_API_KEY')
-        RENDER_SERVICE_ID = credentials('RENDER_SERVICE_ID')
     }
     
     stages {
@@ -34,17 +36,17 @@ pipeline {
         
         stage('Deploy to Render') {
             steps {
-                sh '''
-                    curl -X POST "https://api.render.com/deploy/srv-${RENDER_SERVICE_ID}?key=${RENDER_API_KEY}"
-                '''
+                withCredentials([string(credentialsId: 'RENDER_API_KEY', variable: 'RENDER_API_KEY'),
+                               string(credentialsId: 'RENDER_SERVICE_ID', variable: 'RENDER_SERVICE_ID')]) {
+                    sh '''
+                        curl -X POST "https://api.render.com/deploy/srv-${RENDER_SERVICE_ID}?key=${RENDER_API_KEY}"
+                    '''
+                }
             }
         }
     }
     
     post {
-        always {
-            cleanWs()
-        }
         success {
             echo 'Pipeline completed successfully!'
         }
