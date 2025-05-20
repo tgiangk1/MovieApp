@@ -63,10 +63,10 @@ function MovieDetail() {
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: 24 }}>
-      {movie.backdrop_path && (
+      {movie.thumb_url && (
         <img
-          src={BACKDROP_BASE + movie.backdrop_path}
-          alt={movie.title}
+          src={movie.thumb_url}
+          alt={movie.name}
           style={{ width: '100%', borderRadius: 12, marginBottom: 24, maxHeight: 400, objectFit: 'cover' }}
         />
       )}
@@ -95,35 +95,44 @@ function MovieDetail() {
 
       <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
         <img
-          src={movie.poster_path ? IMAGE_BASE + movie.poster_path : DEFAULT_POSTER}
-          alt={movie.title}
+          src={movie.poster_url || DEFAULT_POSTER}
+          alt={movie.name}
           style={{ width: 240, borderRadius: 12 }}
         />
         <div style={{ flex: 1, minWidth: 300 }}>
-          <h2 style={{ marginTop: 0 }}>{movie.title}</h2>
-          <p><b>Ngày phát hành:</b> {movie.release_date}</p>
-          <p><b>Điểm TMDB:</b> {movie.vote_average} ({movie.vote_count} đánh giá)</p>
-          <p><b>Thể loại:</b> {movie.genres.map(g => g.name).join(', ')}</p>
-          <p><b>Thời lượng:</b> {movie.runtime} phút</p>
-          <p><b>Mô tả:</b> {movie.overview}</p>
+          <h2 style={{ marginTop: 0 }}>{movie.name}</h2>
+          <p><b>Năm sản xuất:</b> {movie.year}</p>
+          <p><b>Thời lượng:</b> {movie.time}</p>
+          <p><b>Thể loại:</b> {movie.category.map(c => c.name).join(', ')}</p>
+          <p><b>Quốc gia:</b> {movie.country.map(c => c.name).join(', ')}</p>
+          <p><b>Diễn viên:</b> {movie.actor.join(', ')}</p>
+          <p><b>Đạo diễn:</b> {movie.director.join(', ')}</p>
+          <p><b>Mô tả:</b> {movie.content}</p>
           
-          {movie.homepage && (
-            <a 
-              href={movie.homepage}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-block',
-                marginTop: '20px',
-                padding: '10px 20px',
-                backgroundColor: '#ff512f',
-                color: 'white',
-                textDecoration: 'none',
-                borderRadius: '5px'
-              }}
-            >
-              Xem phim
-            </a>
+          {movie.videos && movie.videos.length > 0 && (
+            <div style={{ marginTop: 20 }}>
+              <h3>Tập phim</h3>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                {movie.videos.map((episode, index) => (
+                  <a
+                    key={episode.slug}
+                    href={episode.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#ff512f',
+                      color: 'white',
+                      textDecoration: 'none',
+                      borderRadius: '5px',
+                      display: 'inline-block'
+                    }}
+                  >
+                    Tập {episode.name}
+                  </a>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>

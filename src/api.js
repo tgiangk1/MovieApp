@@ -1,13 +1,6 @@
 import axios from 'axios';
 
-const API_KEY = '30c58524d39e6449614788409480e6da';
-const API_BASE = 'https://api.themoviedb.org/3';
-
-const headers = {
-  'Authorization': `Bearer ${API_KEY}`,
-  'Content-Type': 'application/json',
-  'Accept': 'application/json'
-};
+const API_BASE = 'https://ophim1.com';
 
 const handleError = (error) => {
   console.error('API Error:', error);
@@ -16,11 +9,8 @@ const handleError = (error) => {
 
 export const getTrending = async () => {
   try {
-    const res = await axios.get(`${API_BASE}/trending/movie/week`, {
-      params: { language: 'vi-VN' },
-      headers
-    });
-    return res.data.results;
+    const res = await axios.get(`${API_BASE}/danh-sach/phim-moi-cap-nhat`);
+    return res.data.items;
   } catch (error) {
     handleError(error);
   }
@@ -28,11 +18,13 @@ export const getTrending = async () => {
 
 export const getMovies = async (page = 1) => {
   try {
-    const res = await axios.get(`${API_BASE}/movie/now_playing`, {
-      params: { language: 'vi-VN', page },
-      headers
+    const res = await axios.get(`${API_BASE}/danh-sach/phim-le`, {
+      params: { page }
     });
-    return { items: res.data.results, totalPages: res.data.total_pages };
+    return { 
+      items: res.data.items,
+      totalPages: Math.ceil(res.data.total / res.data.per_page)
+    };
   } catch (error) {
     handleError(error);
   }
@@ -40,32 +32,24 @@ export const getMovies = async (page = 1) => {
 
 export const getTVShows = async (page = 1) => {
   try {
-    const res = await axios.get(`${API_BASE}/tv/on_the_air`, {
-      params: { language: 'vi-VN', page },
-      headers
+    const res = await axios.get(`${API_BASE}/danh-sach/phim-bo`, {
+      params: { page }
     });
-    return { items: res.data.results, totalPages: res.data.total_pages };
+    return { 
+      items: res.data.items,
+      totalPages: Math.ceil(res.data.total / res.data.per_page)
+    };
   } catch (error) {
     handleError(error);
   }
 };
 
-export const getMovieDetail = async (id) => {
+export const getMovieDetail = async (slug) => {
   try {
-    const [movieRes, videosRes] = await Promise.all([
-      axios.get(`${API_BASE}/movie/${id}`, {
-        params: { language: 'vi-VN' },
-        headers
-      }),
-      axios.get(`${API_BASE}/movie/${id}/videos`, {
-        params: { language: 'vi-VN' },
-        headers
-      })
-    ]);
-    
+    const res = await axios.get(`${API_BASE}/phim/${slug}`);
     return {
-      ...movieRes.data,
-      videos: videosRes.data.results
+      ...res.data.movie,
+      videos: res.data.episodes
     };
   } catch (error) {
     handleError(error);
