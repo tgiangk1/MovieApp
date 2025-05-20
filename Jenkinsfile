@@ -1,15 +1,23 @@
 pipeline {
     agent any
     
-    tools {
-        nodejs 'NodeJS 18'
-    }
-    
     environment {
         NODE_VERSION = '18.0.0'
     }
     
     stages {
+        stage('Setup Node.js') {
+            steps {
+                sh '''
+                    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+                    export NVM_DIR="$HOME/.nvm"
+                    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                    nvm install ${NODE_VERSION}
+                    nvm use ${NODE_VERSION}
+                '''
+            }
+        }
+        
         stage('Checkout') {
             steps {
                 checkout scm
@@ -18,19 +26,31 @@ pipeline {
         
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                sh '''
+                    export NVM_DIR="$HOME/.nvm"
+                    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                    npm install
+                '''
             }
         }
         
         stage('Build') {
             steps {
-                sh 'npm run build'
+                sh '''
+                    export NVM_DIR="$HOME/.nvm"
+                    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                    npm run build
+                '''
             }
         }
         
         stage('Test') {
             steps {
-                sh 'npm test'
+                sh '''
+                    export NVM_DIR="$HOME/.nvm"
+                    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                    npm test
+                '''
             }
         }
         
