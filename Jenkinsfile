@@ -3,6 +3,8 @@ pipeline {
     
     environment {
         NODE_VERSION = '18.0.0'
+        RENDER_API_KEY = credentials('RENDER_API_KEY')
+        RENDER_SERVICE_ID = credentials('RENDER_SERVICE_ID')
     }
     
     stages {
@@ -33,7 +35,7 @@ pipeline {
         stage('Deploy to Render') {
             steps {
                 sh '''
-                    curl -X POST "https://api.render.com/deploy/srv-xxxxx?key=YOUR_RENDER_API_KEY"
+                    curl -X POST "https://api.render.com/deploy/srv-${RENDER_SERVICE_ID}?key=${RENDER_API_KEY}"
                 '''
             }
         }
