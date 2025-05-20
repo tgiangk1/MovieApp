@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        node {
-            label 'master'
-        }
-    }
+    agent any
     
     environment {
         NODE_VERSION = '18.0.0'
