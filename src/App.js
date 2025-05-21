@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import BannerSlider from './components/BannerSlider';
 import MovieSection from './components/MovieSection';
@@ -14,9 +14,21 @@ function Home() {
   const [tvShows, setTVShows] = useState([]);
 
   useEffect(() => {
-    getTrending().then(setTrending);
-    getMovies().then(data => setMovies(data.items));
-    getTVShows().then(data => setTVShows(data.items));
+    const fetchData = async () => {
+      try {
+        const [trendingData, moviesData, tvShowsData] = await Promise.all([
+          getTrending(),
+          getMovies(),
+          getTVShows()
+        ]);
+        setTrending(trendingData.items || []);
+        setMovies(moviesData.items || []);
+        setTVShows(tvShowsData.items || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
   }, []);
 
   return (
