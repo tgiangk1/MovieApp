@@ -55,14 +55,6 @@ function MovieDetail() {
     }
   };
 
-  const getVideoUrl = (link) => {
-    if (!link) return '';
-    // If the link is already a full URL, return it
-    if (link.startsWith('http')) return link;
-    // Otherwise, prepend the base URL
-    return `https://ophim1.com${link}`;
-  };
-
   if (loading) return (
     <div style={{ textAlign: 'center', padding: '40px' }}>
       <div>Đang tải chi tiết phim...</div>
