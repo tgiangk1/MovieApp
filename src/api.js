@@ -13,6 +13,10 @@ const api = axios.create({
 const handleError = (error) => {
   if (error.response) {
     console.error('API Error:', error.response.data);
+    // Don't throw error if we get a valid response with empty data
+    if (error.response.data && error.response.data.status === false) {
+      return { items: [], totalPages: 0 };
+    }
     throw new Error(error.response.data.message || 'API request failed');
   } else if (error.request) {
     console.error('Network Error:', error.request);
@@ -33,7 +37,7 @@ export const getTrending = async (page = 1) => {
       totalPages: Math.ceil((res.data.pagination?.totalItems || 0) / (res.data.pagination?.totalItemsPerPage || 1))
     };
   } catch (error) {
-    handleError(error);
+    return handleError(error);
   }
 };
 
@@ -47,7 +51,7 @@ export const getMovies = async (page = 1) => {
       totalPages: Math.ceil((res.data.pagination?.totalItems || 0) / (res.data.pagination?.totalItemsPerPage || 1))
     };
   } catch (error) {
-    handleError(error);
+    return handleError(error);
   }
 };
 
@@ -61,7 +65,7 @@ export const getTVShows = async (page = 1) => {
       totalPages: Math.ceil((res.data.pagination?.totalItems || 0) / (res.data.pagination?.totalItemsPerPage || 1))
     };
   } catch (error) {
-    handleError(error);
+    return handleError(error);
   }
 };
 
