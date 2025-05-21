@@ -7,10 +7,15 @@ const handleError = (error) => {
   throw error;
 };
 
-export const getTrending = async () => {
+export const getTrending = async (page = 1) => {
   try {
-    const res = await axios.get(`${API_BASE}/danh-sach/phim-moi-cap-nhat`);
-    return res.data.items;
+    const res = await axios.get(`${API_BASE}/danh-sach/phim-moi-cap-nhat`, {
+      params: { page }
+    });
+    return { 
+      items: res.data.items,
+      totalPages: Math.ceil(res.data.pagination.totalItems / res.data.pagination.totalItemsPerPage)
+    };
   } catch (error) {
     handleError(error);
   }
@@ -23,7 +28,7 @@ export const getMovies = async (page = 1) => {
     });
     return { 
       items: res.data.items,
-      totalPages: Math.ceil(res.data.total / res.data.per_page)
+      totalPages: Math.ceil(res.data.pagination.totalItems / res.data.pagination.totalItemsPerPage)
     };
   } catch (error) {
     handleError(error);
@@ -37,7 +42,7 @@ export const getTVShows = async (page = 1) => {
     });
     return { 
       items: res.data.items,
-      totalPages: Math.ceil(res.data.total / res.data.per_page)
+      totalPages: Math.ceil(res.data.pagination.totalItems / res.data.pagination.totalItemsPerPage)
     };
   } catch (error) {
     handleError(error);

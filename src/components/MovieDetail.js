@@ -2,10 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getMovieDetail } from '../api';
 import { useParams, useNavigate } from 'react-router-dom';
 
-const IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
-const BACKDROP_BASE = "https://image.tmdb.org/t/p/original";
 const DEFAULT_POSTER = "https://via.placeholder.com/240x360?text=No+Image";
-const YOUTUBE_BASE = "https://www.youtube.com/embed/";
 
 function MovieDetail() {
   const { slug } = useParams();
@@ -59,8 +56,6 @@ function MovieDetail() {
 
   if (!movie) return null;
 
-  const trailer = movie.videos?.find(video => video.type === 'Trailer');
-
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: 24 }}>
       {movie.thumb_url && (
@@ -69,28 +64,6 @@ function MovieDetail() {
           alt={movie.name}
           style={{ width: '100%', borderRadius: 12, marginBottom: 24, maxHeight: 400, objectFit: 'cover' }}
         />
-      )}
-      
-      {trailer && (
-        <div style={{ marginBottom: 24 }}>
-          <h3>Trailer</h3>
-          <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
-            <iframe
-              src={`${YOUTUBE_BASE}${trailer.key}`}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                border: 'none',
-                borderRadius: 12
-              }}
-              allowFullScreen
-              title="Movie Trailer"
-            />
-          </div>
-        </div>
       )}
 
       <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
@@ -101,19 +74,19 @@ function MovieDetail() {
         />
         <div style={{ flex: 1, minWidth: 300 }}>
           <h2 style={{ marginTop: 0 }}>{movie.name}</h2>
+          <p><b>Tên gốc:</b> {movie.origin_name}</p>
           <p><b>Năm sản xuất:</b> {movie.year}</p>
-          <p><b>Thời lượng:</b> {movie.time}</p>
-          <p><b>Thể loại:</b> {movie.category.map(c => c.name).join(', ')}</p>
-          <p><b>Quốc gia:</b> {movie.country.map(c => c.name).join(', ')}</p>
-          <p><b>Diễn viên:</b> {movie.actor.join(', ')}</p>
-          <p><b>Đạo diễn:</b> {movie.director.join(', ')}</p>
+          <p><b>Thể loại:</b> {movie.category?.map(c => c.name).join(', ')}</p>
+          <p><b>Quốc gia:</b> {movie.country?.map(c => c.name).join(', ')}</p>
+          <p><b>Diễn viên:</b> {movie.actor?.join(', ')}</p>
+          <p><b>Đạo diễn:</b> {movie.director?.join(', ')}</p>
           <p><b>Mô tả:</b> {movie.content}</p>
           
           {movie.videos && movie.videos.length > 0 && (
             <div style={{ marginTop: 20 }}>
               <h3>Tập phim</h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                {movie.videos.map((episode, index) => (
+                {movie.videos.map((episode) => (
                   <a
                     key={episode.slug}
                     href={episode.link}
