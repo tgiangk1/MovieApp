@@ -33,8 +33,8 @@ pipeline {
         stage('Deploy to Render') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'render-api-key', variable: 'RENDER_API_KEY'),
-                    string(credentialsId: 'render-service-id', variable: 'RENDER_SERVICE_ID')
+                    string(credentialsId: 'RENDER_API_KEY', variable: 'RENDER_API_KEY'),
+                    string(credentialsId: 'RENDER_SERVICE_ID', variable: 'RENDER_SERVICE_ID')
                 ]) {
                     sh '''
                         echo "Starting deployment to Render..."
