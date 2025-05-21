@@ -41,33 +41,9 @@ export const getTrending = async (page = 1) => {
   }
 };
 
-export const getMovies = async (page = 1) => {
-  try {
-    const res = await api.get('/danh-sach/phim-le', {
-      params: { page }
-    });
-    return { 
-      items: res.data.items || [],
-      totalPages: Math.ceil((res.data.pagination?.totalItems || 0) / (res.data.pagination?.totalItemsPerPage || 1))
-    };
-  } catch (error) {
-    return handleError(error);
-  }
-};
-
-export const getTVShows = async (page = 1) => {
-  try {
-    const res = await api.get('/danh-sach/phim-bo', {
-      params: { page }
-    });
-    return { 
-      items: res.data.items || [],
-      totalPages: Math.ceil((res.data.pagination?.totalItems || 0) / (res.data.pagination?.totalItemsPerPage || 1))
-    };
-  } catch (error) {
-    return handleError(error);
-  }
-};
+// Use the same endpoint for movies and TV shows
+export const getMovies = getTrending;
+export const getTVShows = getTrending;
 
 export const getMovieDetail = async (slug) => {
   try {
