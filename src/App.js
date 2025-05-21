@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import BannerSlider from './components/BannerSlider';
 import MovieSection from './components/MovieSection';
@@ -8,10 +8,52 @@ import Footer from './components/Footer';
 import { getTrending, getMovies, getTVShows } from './api';
 import './App.css';
 
+// Error Boundary Component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          <h2>Đã xảy ra lỗi</h2>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#ff512f',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Tải lại trang
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 function Home() {
   const [trending, setTrending] = useState([]);
   const [movies, setMovies] = useState([]);
   const [tvShows, setTVShows] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,10 +68,32 @@ function Home() {
         setTVShows(tvShowsData.items || []);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setError('Không thể tải dữ liệu. Vui lòng thử lại sau.');
       }
     };
     fetchData();
   }, []);
+
+  if (error) {
+    return (
+      <div style={{ textAlign: 'center', padding: '40px' }}>
+        <p style={{ color: 'red' }}>{error}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#ff512f',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer'
+          }}
+        >
+          Tải lại trang
+        </button>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -44,7 +108,7 @@ function Home() {
 
 function App() {
   return (
-    <Router>
+    <ErrorBoundary>
       <div>
         <Header />
         <Routes>
@@ -53,7 +117,7 @@ function App() {
         </Routes>
         <Footer />
       </div>
-    </Router>
+    </ErrorBoundary>
   );
 }
 
