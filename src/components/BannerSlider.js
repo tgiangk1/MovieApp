@@ -16,20 +16,29 @@ function BannerSlider({ movies = [] }) {
     arrows: false
   };
 
-  if (!movies || movies.length === 0) {
-    return null;
+  // Early return if no movies
+  if (!Array.isArray(movies) || movies.length === 0) {
+    return (
+      <div className="banner-slider" style={{marginBottom:32,height:400,backgroundColor:'#f0f0f0',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:12}}>
+        <p style={{color:'#666',fontSize:'1.2rem'}}>Không có phim nào để hiển thị</p>
+      </div>
+    );
   }
 
   return (
     <div className="banner-slider" style={{marginBottom:32}}>
       <Slider {...settings}>
         {movies.map(movie => (
-          <div key={movie._id}>
+          <div key={movie.slug}>
             <Link to={`/phim/${movie.slug}`}>
               <img
                 src={movie.thumb_url}
                 alt={movie.name}
                 style={{width:'100%',height:400,objectFit:'cover',borderRadius:12}}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://via.placeholder.com/800x400?text=No+Image';
+                }}
               />
               <div className="banner-caption" style={{
                 position:'absolute',bottom:40,left:40,color:'#fff',textShadow:'0 2px 8px #000',fontSize:'2rem',fontWeight:'bold'
