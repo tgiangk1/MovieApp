@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        NODE_VERSION = '18.x'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -22,18 +26,33 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'npm test || true'  // Bỏ qua lỗi test nếu chưa có test
+                sh 'npm test || true'  // Continue even if tests fail
             }
         }
 
         stage('Deploy to Render') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'RENDER_API_KEY', variable: 'RENDER_API_KEY'),
-                    string(credentialsId: 'RENDER_SERVICE_ID', variable: 'RENDER_SERVICE_ID')
+                    string(credentialsId: 'render-api-key', variable: 'RENDER_API_KEY'),
+                    string(credentialsId: 'render-service-id', variable: 'RENDER_SERVICE_ID')
                 ]) {
                     sh '''
-                        curl -X POST "https://api.render.com/deploy/srv-${RENDER_SERVICE_ID}?key=${RENDER_API_KEY}"
+                        echo "Starting deployment to Render..."
+                        RESPONSE=$(curl -s -X POST "https://api.render.com/deploy/srv-${RENDER_SERVICE_ID}?key=${RENDER_API_KEY}")
+                        echo "Deployment response: $RESPONSE"
+                        
+                        if [[ $RESPONSE == *"Not Found"* ]]; then
+                            echo "Error: Service not found. Please check your service ID."
+                            exit 1
+                        elif [[ $RESPONSE == *"Unauthorized"* ]]; then
+                            echo "Error: Unauthorized. Please check your API key."
+                            exit 1
+                        elif [[ $RESPONSE == *"error"* ]]; then
+                            echo "Error: Deployment failed. Response: $RESPONSE"
+                            exit 1
+                        else
+                            echo "Deployment triggered successfully!"
+                        fi
                     '''
                 }
             }
@@ -42,10 +61,13 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deploy successful!'
+            echo '✅ Pipeline completed successfully!'
         }
         failure {
-            echo '❌ Deploy failed!'
+            echo '❌ Pipeline failed!'
+        }
+        always {
+            echo 'Pipeline finished.'
         }
     }
 }
